@@ -4,138 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GLTRADES | Trading Analytics & Journal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        :root {
-            --primary: #10b981;
-            --primary-dark: #059669;
-            --bg-deep: #09090b;
-            --surface: #121214;
-            --border: rgba(255, 255, 255, 0.05);
-        }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-deep); color: #fafafa; margin: 0; }
-        .glass-card { background: var(--surface); border: 1px solid var(--border); backdrop-filter: blur(10px); border-radius: 12px; }
-        .nav-link { transition: all 0.2s; color: #94a3b8; }
-        .nav-link:hover, .nav-link.active { color: var(--primary); background: rgba(16, 185, 129, 0.05); }
-        .sidebar { width: 260px; border-right: 1px solid var(--border); background: #0c0c0e; }
-        .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    </style>
 </head>
-<body class="flex h-screen overflow-hidden">
-
-    <aside class="sidebar flex flex-col p-6">
-        <div class="mb-10 px-2">
-            <h1 class="text-2xl font-black italic text-white tracking-tighter">GL<span class="text-[#10b981]">TRADES</span></h1>
-            <p class="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Trading Analytics</p>
-        </div>
-        
-        <nav class="flex-1 space-y-1">
-            <a href="#" onclick="showPage('dashboard')" class="nav-link active flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium">
-                <i data-lucide="layout-grid" class="w-4 h-4"></i> Dashboard
-            </a>
-            <a href="#" onclick="showPage('trades')" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium">
-                <i data-lucide="list" class="w-4 h-4"></i> Trades
-            </a>
-            <a href="#" onclick="showPage('reports')" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium">
-                <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Reports
-            </a>
-            <a href="#" onclick="showPage('playbooks')" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium">
-                <i data-lucide="book-open" class="w-4 h-4"></i> Playbooks
-            </a>
-            <a href="#" onclick="showPage('university')" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium">
-                <i data-lucide="graduation-cap" class="w-4 h-4"></i> GL University
-            </a>
-        </nav>
-    </aside>
-
-    <main class="flex-1 overflow-y-auto p-10">
-        
-        <div id="dashboard" class="page active space-y-8">
-            <div class="flex justify-between items-center">
-                <h2 class="text-3xl font-bold tracking-tight">Command Center</h2>
-                <button onclick="openModal()" class="bg-[#10b981] text-zinc-950 px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-[#34d399] transition-all">+ Add Trade</button>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>GLTRADES</h1>
+                <span class="brand-tagline">Trading Analytics</span>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="glass-card p-6">
-                    <p class="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Net P/L</p>
-                    <h3 id="stat-pnl" class="text-2xl font-black text-white">$0.00</h3>
-                </div>
-                <div class="glass-card p-6 border-b-2 border-[#10b981]/30">
-                    <p class="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Win Rate</p>
-                    <h3 id="stat-winrate" class="text-2xl font-black text-white">0%</h3>
-                </div>
-                <div class="glass-card p-6">
-                    <p class="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Profit Factor</p>
-                    <h3 id="stat-pf" class="text-2xl font-black text-white">0.00</h3>
-                </div>
-                <div class="glass-card p-6">
-                    <p class="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Avg Win/Loss</p>
-                    <h3 id="stat-avg" class="text-2xl font-black text-white">0.00</h3>
-                </div>
-            </div>
-
-            <div class="glass-card p-8">
-                <h4 class="font-bold mb-6 text-zinc-400">Equity Growth Curve</h4>
-                <div class="h-64 w-full">
-                    <canvas id="equityChart"></canvas>
-                </div>
-            </div>
+            <ul class="nav-menu">
+                <li><a href="#" data-page="dashboard" class="nav-link active">Dashboard</a></li>
+                <li><a href="#" data-page="trades" class="nav-link">Trades</a></li>
+                <li><a href="#" data-page="reports" class="nav-link">Reports</a></li>
+                <li><a href="#" data-page="playbooks" class="nav-link">Playbooks</a></li>
+                <li><a href="#" data-page="journal" class="nav-link">Journal</a></li>
+                <li><a href="#" data-page="university" class="nav-link">GL University</a></li>
+                <li><a href="#" data-page="settings" class="nav-link">Settings</a></li>
+            </ul>
         </div>
+    </nav>
 
-        <div id="trades" class="page pt-20 text-center">
-            <h2 class="text-4xl font-black opacity-20 italic">TRADE ARCHIVE</h2>
-        </div>
-        <div id="reports" class="page pt-20 text-center">
-            <h2 class="text-4xl font-black opacity-20 italic">ANALYTICS ENGINE</h2>
-        </div>
-        <div id="university" class="page pt-20 text-center">
-            <h2 class="text-4xl font-black opacity-20 italic">GL UNIVERSITY</h2>
-        </div>
-
+    <main class="main-content">
+        <div id="page-content"></div>
     </main>
 
-    <script>
-        // PAGE NAVIGATION
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            
-            document.getElementById(pageId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
-
-        // INITIALIZE CHART
-        const ctx = document.getElementById('equityChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-                datasets: [{
-                    label: 'Equity',
-                    data: [0, 1200, 800, 2500, 2100],
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { grid: { color: 'rgba(255,255,255,0.05)' } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
-
-        lucide.createIcons();
-    </script>
+    <script src="js/app.js"></script>
 </body>
 </html>
