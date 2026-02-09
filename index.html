@@ -3,122 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLTRADES | Trading Intelligence</title>
+    <title>GLTRADES | Professional Journal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --forest: #052e16; --emerald: #022c22; --lime: #84cc16; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--emerald); color: white; margin: 0; overflow: hidden; }
-        
-        /* Page Visibility Logic */
-        .page-section { display: none; }
-        .page-section.active { display: block; animation: fadeIn 0.3s ease; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .nav-btn { border-left: 4px solid transparent; transition: 0.2s; }
-        .nav-btn.active { border-left: 4px solid var(--lime); background: rgba(132, 204, 22, 0.1); color: var(--lime); }
-        .glass { background: rgba(6, 78, 59, 0.4); border: 1px solid rgba(132, 204, 22, 0.1); border-radius: 12px; }
+        body { font-family: 'Inter', sans-serif; background-color: #09090b; color: #fafafa; }
+        .glass-card { background: rgba(18, 18, 20, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
+        .sidebar-link:hover { background: rgba(255, 255, 255, 0.03); }
+        .active-nav { border-left: 2px solid #3b82f6; background: rgba(59, 130, 246, 0.05); }
+        .stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
+        .chart-placeholder { background: linear-gradient(180deg, rgba(59, 130, 246, 0.1) 0%, rgba(9, 9, 11, 0) 100%); }
     </style>
 </head>
-<body class="flex h-screen">
+<body class="flex min-h-screen overflow-hidden">
 
-    <aside class="w-64 bg-[#052e16] border-r border-emerald-900/50 flex flex-col">
-        <div class="p-8"><h1 class="text-2xl font-black italic">GL<span class="text-lime-500">TRADES</span></h1></div>
+    <aside class="w-64 border-r border-white/5 flex flex-col z-50 bg-[#09090b]">
+        <div class="p-8">
+            <h1 class="text-xl font-bold tracking-tighter text-white">GL<span class="text-blue-500">TRADES</span></h1>
+        </div>
         
-        <nav class="flex-1 px-2 space-y-1" id="nav-container">
-            <button onclick="showPage('dashboard', this)" class="nav-btn active w-full flex items-center gap-3 px-6 py-4 text-sm font-bold">
-                <i data-lucide="layout-grid"></i> Dashboard
-            </button>
-            <button onclick="showPage('trades', this)" class="nav-btn w-full flex items-center gap-3 px-6 py-4 text-sm font-medium">
-                <i data-lucide="database"></i> Trades
-            </button>
-            <button onclick="showPage('reports', this)" class="nav-btn w-full flex items-center gap-3 px-6 py-4 text-sm font-medium">
-                <i data-lucide="bar-chart-2"></i> Reports
-            </button>
-            <button onclick="showPage('playbooks', this)" class="nav-btn w-full flex items-center gap-3 px-6 py-4 text-sm font-medium">
-                <i data-lucide="book-open"></i> Playbooks
-            </button>
+        <nav class="flex-1 px-4 space-y-2">
+            <a href="#" class="sidebar-link active-nav flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-blue-400">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+            </a>
+            <a href="#" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-400 hover:text-white">
+                <i data-lucide="book-open" class="w-4 h-4"></i> Trade Log
+            </a>
+            <a href="#" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-400 hover:text-white">
+                <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics
+            </a>
+            <a href="#" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-400 hover:text-white">
+                <i data-lucide="calendar" class="w-4 h-4"></i> Calendar
+            </a>
         </nav>
+
+        <div class="p-6 border-t border-white/5">
+            <button class="flex items-center gap-3 px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors">
+                <i data-lucide="settings" class="w-4 h-4"></i> Settings
+            </button>
+        </div>
     </aside>
 
-    <main class="flex-1 overflow-y-auto">
-        <header class="h-20 border-b border-emerald-900/50 flex items-center px-8 bg-emerald-950/50 backdrop-blur-md sticky top-0">
-            <h2 id="view-title" class="text-xs font-black uppercase tracking-widest text-emerald-500">Dashboard</h2>
+    <main class="flex-1 overflow-y-auto relative">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 sticky top-0 bg-[#09090b]/80 backdrop-blur-md z-40">
+            <div>
+                <h2 class="text-lg font-medium">Performance Overview</h2>
+                <p class="text-xs text-zinc-500">Welcome back, Trader.</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="px-4 py-2 bg-white text-black text-xs font-semibold rounded-md hover:bg-zinc-200 transition-all">
+                    + Add Trade
+                </button>
+                <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-bold">JD</div>
+            </div>
         </header>
 
-        <section id="dashboard" class="page-section active p-10">
-            <div class="grid grid-cols-3 gap-6 mb-10">
-                <div class="glass p-8"><p class="text-xs text-emerald-500 font-bold uppercase">Net P/L</p><h3 class="text-3xl font-black text-lime-400">+$12,450</h3></div>
-                <div class="glass p-8"><p class="text-xs text-emerald-500 font-bold uppercase">Win Rate</p><h3 class="text-3xl font-black">68%</h3></div>
-                <div class="glass p-8"><p class="text-xs text-emerald-500 font-bold uppercase">Profit Factor</p><h3 class="text-3xl font-black">2.2</h3></div>
-            </div>
-            <div class="glass p-20 text-center border-dashed border-emerald-800">
-                <p class="text-emerald-700 font-bold uppercase tracking-widest">Performance Curve Loading...</p>
-            </div>
-        </section>
+        <div class="p-10 max-w-7xl mx-auto space-y-8">
+            
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 glass-card rounded-2xl p-8 flex flex-col justify-between min-h-[320px]">
+                    <div>
+                        <span class="text-zinc-500 text-sm font-medium">Total Net P&L</span>
+                        <h3 class="text-5xl font-bold mt-2 text-emerald-400">+$12,450.82</h3>
+                    </div>
+                    <div class="flex-1 mt-8 relative">
+                        <div class="absolute inset-0 chart-placeholder rounded-lg"></div>
+                        <svg class="w-full h-full" viewBox="0 0 400 100" preserveAspectRatio="none">
+                            <path d="M0,80 Q50,70 100,75 T200,40 T300,50 T400,10" fill="none" stroke="#10b981" stroke-width="2" />
+                        </svg>
+                    </div>
+                </div>
 
-        <section id="trades" class="page-section p-10">
-            <h3 class="text-xl font-bold mb-6">Trade History</h3>
-            <div class="glass overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-emerald-900/50 text-emerald-400 text-[10px] uppercase">
-                        <tr><th class="p-4">Symbol</th><th class="p-4">Side</th><th class="p-4 text-right">Profit</th></tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        <tr class="border-t border-emerald-900/30"><td class="p-4 font-bold">NAS100</td><td class="p-4 text-lime-500">LONG</td><td class="p-4 text-right text-lime-400">+$630</td></tr>
-                        <tr class="border-t border-emerald-900/30"><td class="p-4 font-bold">XAUUSD</td><td class="p-4 text-red-500">SHORT</td><td class="p-4 text-right text-red-400">-$210</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="glass-card rounded-xl p-6 stat-card">
+                        <span class="text-zinc-500 text-xs block mb-1">Win Rate</span>
+                        <span class="text-2xl font-semibold">68.2%</span>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 stat-card">
+                        <span class="text-zinc-500 text-xs block mb-1">Trades</span>
+                        <span class="text-2xl font-semibold">142</span>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 stat-card">
+                        <span class="text-zinc-500 text-xs block mb-1">Avg Win</span>
+                        <span class="text-xl font-semibold text-emerald-500">+$420</span>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 stat-card">
+                        <span class="text-zinc-500 text-xs block mb-1">Avg Loss</span>
+                        <span class="text-xl font-semibold text-red-500">-$185</span>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 stat-card col-span-2 flex justify-between items-center">
+                        <span class="text-zinc-500 text-xs block">Profit Factor</span>
+                        <span class="text-xl font-semibold">2.27</span>
+                    </div>
+                </div>
+            </section>
 
-        <section id="reports" class="page-section p-10">
-            <h3 class="text-xl font-bold mb-6">Advanced Analytics</h3>
-            <div class="grid grid-cols-2 gap-6">
-                <div class="glass h-48 flex items-center justify-center text-emerald-600 font-bold uppercase">Volume Analysis</div>
-                <div class="glass h-48 flex items-center justify-center text-emerald-600 font-bold uppercase">Time of Day Edge</div>
-            </div>
-        </section>
+            <section class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-medium">Recent Trades</h3>
+                    <div class="flex gap-3">
+                        <button class="text-xs px-3 py-1.5 glass-card rounded-md text-zinc-400 hover:text-white transition-colors">Filter</button>
+                        <button class="text-xs px-3 py-1.5 glass-card rounded-md text-zinc-400 hover:text-white transition-colors">Export</button>
+                    </div>
+                </div>
 
-        <section id="playbooks" class="page-section p-10">
-            <h3 class="text-xl font-bold mb-6">Active Playbooks</h3>
-            <div class="glass p-10 border-l-4 border-lime-500">
-                <h4 class="text-lime-500 font-bold">Silver Bullet Strategy</h4>
-                <p class="text-sm text-emerald-200 mt-2">Targeting FVG during NY AM session. 2R minimum requirement.</p>
-            </div>
-        </section>
-
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b border-white/5 text-zinc-500">
+                                <th class="px-6 py-4 font-medium uppercase text-[10px]">Date</th>
+                                <th class="px-6 py-4 font-medium uppercase text-[10px]">Symbol</th>
+                                <th class="px-6 py-4 font-medium uppercase text-[10px]">Side</th>
+                                <th class="px-6 py-4 font-medium uppercase text-[10px]">Entry</th>
+                                <th class="px-6 py-4 font-medium uppercase text-[10px]">Exit</th>
+                                <th class="px-6 py-4 font-medium uppercase text-[10px] text-right">Net P&L</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            <tr class="hover:bg-white/[0.02] transition-colors group cursor-pointer">
+                                <td class="px-6 py-4 text-zinc-400">Oct 24, 2023</td>
+                                <td class="px-6 py-4 font-semibold text-white">NVDA</td>
+                                <td class="px-6 py-4"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[10px] font-bold">LONG</span></td>
+                                <td class="px-6 py-4 text-zinc-300">$425.20</td>
+                                <td class="px-6 py-4 text-zinc-300">$431.50</td>
+                                <td class="px-6 py-4 text-right font-semibold text-emerald-400">+$630.00</td>
+                            </tr>
+                            <tr class="hover:bg-white/[0.02] transition-colors group cursor-pointer">
+                                <td class="px-6 py-4 text-zinc-400">Oct 23, 2023</td>
+                                <td class="px-6 py-4 font-semibold text-white">TSLA</td>
+                                <td class="px-6 py-4"><span class="px-2 py-0.5 rounded bg-red-500/10 text-red-500 text-[10px] font-bold">SHORT</span></td>
+                                <td class="px-6 py-4 text-zinc-300">$210.10</td>
+                                <td class="px-6 py-4 text-zinc-300">$212.40</td>
+                                <td class="px-6 py-4 text-right font-semibold text-red-400">-$230.00</td>
+                            </tr>
+                             <tr class="hover:bg-white/[0.02] transition-colors group cursor-pointer">
+                                <td class="px-6 py-4 text-zinc-400">Oct 22, 2023</td>
+                                <td class="px-6 py-4 font-semibold text-white">AAPL</td>
+                                <td class="px-6 py-4"><span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500 text-[10px] font-bold">LONG</span></td>
+                                <td class="px-6 py-4 text-zinc-300">$175.50</td>
+                                <td class="px-6 py-4 text-zinc-300">$178.20</td>
+                                <td class="px-6 py-4 text-right font-semibold text-emerald-400">+$270.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
     </main>
 
     <script>
-        // 1. Initialize Icons
+        // Initialize Icons
         lucide.createIcons();
-
-        // 2. The Navigation Function
-        function showPage(pageId, btnElement) {
-            // Hide all pages
-            document.querySelectorAll('.page-section').forEach(page => {
-                page.classList.remove('active');
-            });
-
-            // Remove active style from all buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-                btn.classList.replace('font-bold', 'font-medium');
-            });
-
-            // Show the selected page
-            document.getElementById(pageId).classList.add('active');
-
-            // Set button to active
-            btnElement.classList.add('active');
-            btnElement.classList.replace('font-medium', 'font-bold');
-
-            // Update Header Title
-            document.getElementById('view-title').innerText = pageId;
-        }
     </script>
 </body>
 </html>
