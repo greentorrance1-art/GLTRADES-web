@@ -3,122 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GLTRADES | Trading Intelligence</title>
+    <title>GLTRADES | Professional Journal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --forest: #052e16; --emerald: #022c22; --lime: #84cc16; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--emerald); color: white; margin: 0; overflow: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: #09090b; color: #fafafa; }
+        .glass-card { background: rgba(18, 18, 20, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
+        .sidebar-link { transition: all 0.2s ease; cursor: pointer; border-left: 2px solid transparent; }
+        .sidebar-link:hover { background: rgba(255, 255, 255, 0.03); color: white; }
+        .active-nav { border-left: 2px solid #3b82f6; background: rgba(59, 130, 246, 0.05); color: #60a5fa !important; }
+        .stat-card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
+        .chart-placeholder { background: linear-gradient(180deg, rgba(59, 130, 246, 0.1) 0%, rgba(9, 9, 11, 0) 100%); }
         
-        /* Page Visibility Logic */
-        .page-section { display: none; }
-        .page-section.active { display: block; animation: fadeIn 0.3s ease; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* Page Routing Logic */
+        .page-view { display: none; animation: fadeIn 0.3s ease; }
+        .page-view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .nav-btn { border-left: 4px solid transparent; transition: 0.2s; }
-        .nav-btn.active { border-left: 4px solid var(--lime); background: rgba(132, 204, 22, 0.1); color: var(--lime); }
-        .glass { background: rgba(6, 78, 59, 0.4); border: 1px solid rgba(132, 204, 22, 0.1); border-radius: 12px; }
+        /* Modal Overlay */
+        #tradeModal { background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); }
     </style>
 </head>
-<body class="flex h-screen">
+<body class="flex min-h-screen overflow-hidden">
 
-    <aside class="w-64 bg-[#052e16] border-r border-emerald-900/50 flex flex-col">
-        <div class="p-8"><h1 class="text-2xl font-black italic">GL<span class="text-lime-500">TRADES</span></h1></div>
+    <aside class="w-64 border-r border-white/5 flex flex-col z-50 bg-[#09090b]">
+        <div class="p-8">
+            <h1 class="text-xl font-bold tracking-tighter text-white italic">GL<span class="text-blue-500">TRADES</span></h1>
+        </div>
         
-        <nav class="flex-1 px-2 space-y-1" id="nav-container">
-            <button onclick="showPage('dashboard', this)" class="nav-btn active w-full flex items-center gap-3 px-6 py-4 text-sm font-bold">
-                <i data-lucide="layout-grid"></i> Dashboard
-            </button>
-            <button onclick="showPage('trades', this)" class="nav-btn w-full flex items-center gap-3 px-6 py-4 text-sm font-medium">
-                <i data-lucide="database"></i> Trades
-            </button>
-            <button onclick="showPage('reports', this)" class="nav-btn w-full flex items-center gap-3 px-6 py-4 text-sm font-medium">
-                <i data-lucide="bar-chart-2"></i> Reports
-            </button>
-            <button onclick="showPage('playbooks', this)" class="nav-btn w-full flex items-center gap-3 px-6 py-4 text-sm font-medium">
-                <i data-lucide="book-open"></i> Playbooks
-            </button>
+        <nav class="flex-1 px-4 space-y-2" id="sidebar-nav">
+            <div onclick="showPage('dashboard', this)" class="sidebar-link active-nav flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-400">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+            </div>
+            <div onclick="showPage('trades', this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-400">
+                <i data-lucide="book-open" class="w-4 h-4"></i> Trade Log
+            </div>
+            <div onclick="showPage('analytics', this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-400">
+                <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Analytics
+            </div>
+            <div onclick="showPage('calendar', this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-zinc-400">
+                <i data-lucide="calendar" class="w-4 h-4"></i> Calendar
+            </div>
         </nav>
+
+        <div class="p-6 border-t border-white/5">
+            <button class="flex items-center gap-3 px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors">
+                <i data-lucide="settings" class="w-4 h-4"></i> Settings
+            </button>
+        </div>
     </aside>
 
-    <main class="flex-1 overflow-y-auto">
-        <header class="h-20 border-b border-emerald-900/50 flex items-center px-8 bg-emerald-950/50 backdrop-blur-md sticky top-0">
-            <h2 id="view-title" class="text-xs font-black uppercase tracking-widest text-emerald-500">Dashboard</h2>
+    <main class="flex-1 overflow-y-auto relative">
+        <header class="h-20 border-b border-white/5 flex items-center justify-between px-10 sticky top-0 bg-[#09090b]/80 backdrop-blur-md z-40">
+            <div>
+                <h2 id="header-title" class="text-lg font-medium">Performance Overview</h2>
+                <p class="text-xs text-zinc-500">GLTRADES intelligence system</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="openModal()" class="px-4 py-2 bg-white text-black text-xs font-semibold rounded-md hover:bg-zinc-200 transition-all">
+                    + Add Trade
+                </button>
+                <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-bold">JD</div>
+            </div>
         </header>
 
-        <section id="dashboard" class="page-section active p-10">
-            <div class="grid grid-cols-3 gap-6 mb-10">
-                <div class="glass p-8"><p class="text-xs text-emerald-500 font-bold uppercase">Net P/L</p><h3 class="text-3xl font-black text-lime-400">+$12,450</h3></div>
-                <div class="glass p-8"><p class="text-xs text-emerald-500 font-bold uppercase">Win Rate</p><h3 class="text-3xl font-black">68%</h3></div>
-                <div class="glass p-8"><p class="text-xs text-emerald-500 font-bold uppercase">Profit Factor</p><h3 class="text-3xl font-black">2.2</h3></div>
-            </div>
-            <div class="glass p-20 text-center border-dashed border-emerald-800">
-                <p class="text-emerald-700 font-bold uppercase tracking-widest">Performance Curve Loading...</p>
-            </div>
-        </section>
+        <div id="dashboard" class="page-view active p-10 max-w-7xl mx-auto space-y-8">
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 glass-card rounded-2xl p-8 flex flex-col justify-between min-h-[320px]">
+                    <div>
+                        <span class="text-zinc-500 text-sm font-medium uppercase tracking-widest">Total Net P&L</span>
+                        <h3 id="dash-pnl" class="text-5xl font-bold mt-2 text-zinc-400">$0.00</h3>
+                    </div>
+                    <div class="flex-1 mt-8 relative">
+                        <div class="absolute inset-0 chart-placeholder rounded-lg"></div>
+                        <svg class="w-full h-full" viewBox="0 0 400 100" preserveAspectRatio="none">
+                            <path id="equity-path" d="M0,80 Q200,80 400,80" fill="none" stroke="#3b82f6" stroke-width="2" />
+                        </svg>
+                    </div>
+                </div>
 
-        <section id="trades" class="page-section p-10">
-            <h3 class="text-xl font-bold mb-6">Trade History</h3>
-            <div class="glass overflow-hidden">
-                <table class="w-full text-left">
-                    <thead class="bg-emerald-900/50 text-emerald-400 text-[10px] uppercase">
-                        <tr><th class="p-4">Symbol</th><th class="p-4">Side</th><th class="p-4 text-right">Profit</th></tr>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="glass-card rounded-xl p-6 stat-card">
+                        <span class="text-zinc-500 text-xs block mb-1 uppercase">Win Rate</span>
+                        <span id="dash-winrate" class="text-2xl font-semibold">0%</span>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 stat-card">
+                        <span class="text-zinc-500 text-xs block mb-1 uppercase">Total Trades</span>
+                        <span id="dash-count" class="text-2xl font-semibold">0</span>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 stat-card">
+                        <span class="text-zinc-500 text-xs block mb-1 uppercase">Avg Win</span>
+                        <span id="dash-avgwin" class="text-xl font-semibold text-emerald-500">$0</span>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 stat-card">
+                        <span class="text-zinc-500 text-xs block mb-1 uppercase">Avg Loss</span>
+                        <span id="dash-avgloss" class="text-xl font-semibold text-red-500">$0</span>
+                    </div>
+                    <div class="glass-card rounded-xl p-6 stat-card col-span-2 flex justify-between items-center">
+                        <span class="text-zinc-500 text-xs block uppercase">Profit Factor</span>
+                        <span class="text-xl font-semibold italic">Healthy</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-medium">Recent Activity</h3>
+                    <button onclick="clearAllData()" class="text-[10px] text-red-500/50 hover:text-red-500 uppercase font-bold">Clear Data</button>
+                </div>
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b border-white/5 text-zinc-500">
+                                <th class="px-6 py-4 font-medium uppercase text-[10px]">Symbol</th>
+                                <th class="px-6 py-4 font-medium uppercase text-[10px]">Side</th>
+                                <th class="px-6 py-4 font-medium uppercase text-[10px]">Result</th>
+                                <th class="px-6 py-4 font-medium uppercase text-[10px] text-right">Net P&L</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-trades-body" class="divide-y divide-white/5">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <div id="trades" class="page-view p-10 max-w-7xl mx-auto">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h3 class="text-3xl font-bold">Trade Log</h3>
+                    <p class="text-zinc-500 text-sm">Review every execution in detail</p>
+                </div>
+            </div>
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-white/5">
+                        <tr class="text-zinc-400">
+                            <th class="px-6 py-4">Ticker</th>
+                            <th class="px-6 py-4">Direction</th>
+                            <th class="px-6 py-4">Entry</th>
+                            <th class="px-6 py-4">Exit</th>
+                            <th class="px-6 py-4 text-right">Net P/L</th>
+                        </tr>
                     </thead>
-                    <tbody class="text-sm">
-                        <tr class="border-t border-emerald-900/30"><td class="p-4 font-bold">NAS100</td><td class="p-4 text-lime-500">LONG</td><td class="p-4 text-right text-lime-400">+$630</td></tr>
-                        <tr class="border-t border-emerald-900/30"><td class="p-4 font-bold">XAUUSD</td><td class="p-4 text-red-500">SHORT</td><td class="p-4 text-right text-red-400">-$210</td></tr>
-                    </tbody>
+                    <tbody id="full-log-body" class="divide-y divide-white/5">
+                        </tbody>
                 </table>
             </div>
-        </section>
+        </div>
 
-        <section id="reports" class="page-section p-10">
-            <h3 class="text-xl font-bold mb-6">Advanced Analytics</h3>
+        <div id="analytics" class="page-view p-10 max-w-7xl mx-auto">
+            <h3 class="text-3xl font-bold mb-2">Analytics</h3>
+            <p class="text-zinc-500 mb-10">Detailed performance breakdowns</p>
             <div class="grid grid-cols-2 gap-6">
-                <div class="glass h-48 flex items-center justify-center text-emerald-600 font-bold uppercase">Volume Analysis</div>
-                <div class="glass h-48 flex items-center justify-center text-emerald-600 font-bold uppercase">Time of Day Edge</div>
+                <div class="glass-card p-20 text-center border-dashed border-white/10 text-zinc-600 font-bold uppercase tracking-widest">Strategy Distribution</div>
+                <div class="glass-card p-20 text-center border-dashed border-white/10 text-zinc-600 font-bold uppercase tracking-widest">Time of Day Performance</div>
             </div>
-        </section>
+        </div>
 
-        <section id="playbooks" class="page-section p-10">
-            <h3 class="text-xl font-bold mb-6">Active Playbooks</h3>
-            <div class="glass p-10 border-l-4 border-lime-500">
-                <h4 class="text-lime-500 font-bold">Silver Bullet Strategy</h4>
-                <p class="text-sm text-emerald-200 mt-2">Targeting FVG during NY AM session. 2R minimum requirement.</p>
+        <div id="calendar" class="page-view p-10 max-w-7xl mx-auto text-center">
+            <h3 class="text-3xl font-bold mb-2">Trading Calendar</h3>
+            <div class="glass-card p-40 mt-10 flex flex-col items-center justify-center border-dashed border-white/10">
+                <i data-lucide="calendar" class="w-12 h-12 text-zinc-800 mb-4"></i>
+                <p class="text-zinc-500 uppercase text-xs font-black">Calendar Syncing Enabled</p>
             </div>
-        </section>
-
+        </div>
     </main>
 
+    <div id="tradeModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6">
+        <div class="glass-card w-full max-w-md p-8 rounded-3xl shadow-2xl border-blue-500/20">
+            <h3 class="text-2xl font-bold mb-6 italic">Add Execution</h3>
+            <form id="tradeForm" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="symbol" placeholder="Ticker (e.g. NAS100)" class="w-full bg-[#121214] border border-white/10 p-4 rounded-xl outline-none focus:border-blue-500" required>
+                    <select id="side" class="w-full bg-[#121214] border border-white/10 p-4 rounded-xl outline-none focus:border-blue-500">
+                        <option value="LONG">LONG</option>
+                        <option value="SHORT">SHORT</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" id="entry" step="any" placeholder="Entry" class="w-full bg-[#121214] border border-white/10 p-4 rounded-xl outline-none focus:border-blue-500" required>
+                    <input type="number" id="exit" step="any" placeholder="Exit" class="w-full bg-[#121214] border border-white/10 p-4 rounded-xl outline-none focus:border-blue-500" required>
+                </div>
+                <input type="number" id="pnl" step="any" placeholder="Net Profit/Loss ($)" class="w-full bg-[#121214] border border-white/10 p-4 rounded-xl outline-none focus:border-emerald-500 font-bold" required>
+                
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeModal()" class="flex-1 px-4 py-4 rounded-xl text-zinc-500 font-bold hover:text-white uppercase text-xs tracking-widest">Cancel</button>
+                    <button type="submit" class="flex-1 bg-white text-black py-4 rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-zinc-200">Save Trade</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // 1. Initialize Icons
         lucide.createIcons();
 
-        // 2. The Navigation Function
-        function showPage(pageId, btnElement) {
+        // --- DATABASE LOGIC ---
+        let trades = JSON.parse(localStorage.getItem('gl_database')) || [];
+
+        function showPage(pageId, btn) {
             // Hide all pages
-            document.querySelectorAll('.page-section').forEach(page => {
-                page.classList.remove('active');
-            });
-
-            // Remove active style from all buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-                btn.classList.replace('font-bold', 'font-medium');
-            });
-
-            // Show the selected page
+            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+            // Remove active style from buttons
+            document.querySelectorAll('.sidebar-link').forEach(b => b.classList.remove('active-nav'));
+            
+            // Show new page
             document.getElementById(pageId).classList.add('active');
-
-            // Set button to active
-            btnElement.classList.add('active');
-            btnElement.classList.replace('font-medium', 'font-bold');
-
-            // Update Header Title
-            document.getElementById('view-title').innerText = pageId;
+            btn.classList.add('active-nav');
+            
+            // Update Header
+            document.getElementById('header-title').innerText = pageId.charAt(0).toUpperCase() + pageId.slice(1);
+            
+            if(pageId === 'dashboard') updateUI();
+            if(pageId === 'trades') renderFullLog();
         }
+
+        function openModal() { document.getElementById('tradeModal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('tradeModal').classList.add('hidden'); }
+
+        document.getElementById('tradeForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newTrade = {
+                id: Date.now(),
+                symbol: document.getElementById('symbol').value.toUpperCase(),
+                side: document.getElementById('side').value,
+                entry: document.getElementById('entry').value,
+                exit: document.getElementById('exit').value,
+                pnl: parseFloat(document.getElementById('pnl').value),
+                date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+            };
+
+            trades.unshift(newTrade);
+            localStorage.setItem('gl_database', JSON.stringify(trades));
+            
+            e.target.reset();
+            closeModal();
+            updateUI();
+        });
+
+        function updateUI() {
+            const totalPnl = trades.reduce((acc, t) => acc + t.pnl, 0);
+            const wins = trades.filter(t => t.pnl > 0).length;
+            const winRate = trades.length > 0 ? ((wins / trades.length) * 100).toFixed(1) : 0;
+            
+            // Update Dash Stats
+            const pnlEl = document.getElementById('dash-pnl');
+            pnlEl.innerText = (totalPnl >= 0 ? '+$' : '-$') + Math.abs(totalPnl).toLocaleString();
+            pnlEl.className = `text-5xl font-bold mt-2 ${totalPnl >= 0 ? 'text-emerald-400' : 'text-red-500'}`;
+            
+            document.getElementById('dash-winrate').innerText = winRate + '%';
+            document.getElementById('dash-count').innerText = trades.length;
+
+            // Simple Calc for Avg Win/Loss
+            const winTrades = trades.filter(t => t.pnl > 0);
+            const lossTrades = trades.filter(t => t.pnl < 0);
+            const avgWin = winTrades.length > 0 ? (winTrades.reduce((a,b) => a+b.pnl, 0) / winTrades.length).toFixed(0) : 0;
+            const avgLoss = lossTrades.length > 0 ? (lossTrades.reduce((a,b) => a+b.pnl, 0) / lossTrades.length).toFixed(0) : 0;
+            
+            document.getElementById('dash-avgwin').innerText = '+$' + avgWin;
+            document.getElementById('dash-avgloss').innerText = '-$' + Math.abs(avgLoss);
+
+            // Render Recent Table (limit to 5)
+            const body = document.getElementById('recent-trades-body');
+            body.innerHTML = trades.slice(0, 5).map(t => `
+                <tr class="hover:bg-white/[0.02] transition-colors group cursor-pointer">
+                    <td class="px-6 py-4 font-semibold text-white">${t.symbol}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${t.side === 'LONG' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}">${t.side}</span></td>
+                    <td class="px-6 py-4 text-zinc-400">${t.pnl >= 0 ? 'WIN' : 'LOSS'}</td>
+                    <td class="px-6 py-4 text-right font-semibold ${t.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}">${t.pnl >= 0 ? '+' : ''}$${t.pnl.toLocaleString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderFullLog() {
+            const body = document.getElementById('full-log-body');
+            body.innerHTML = trades.map(t => `
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="px-6 py-4 font-bold uppercase">${t.symbol}</td>
+                    <td class="px-6 py-4 text-xs font-black ${t.side === 'LONG' ? 'text-blue-400' : 'text-orange-400'}">${t.side}</td>
+                    <td class="px-6 py-4 text-zinc-500">$${t.entry}</td>
+                    <td class="px-6 py-4 text-zinc-500">$${t.exit}</td>
+                    <td class="px-6 py-4 text-right font-bold ${t.pnl >= 0 ? 'text-emerald-400' : 'text-red-500'}">${t.pnl >= 0 ? '+' : ''}$${t.pnl}</td>
+                </tr>
+            `).join('');
+        }
+
+        function clearAllData() {
+            if(confirm("Clear all trades? This is permanent.")) {
+                trades = [];
+                localStorage.removeItem('gl_database');
+                updateUI();
+            }
+        }
+
+        // Init
+        window.onload = updateUI;
     </script>
 </body>
 </html>
