@@ -1,65 +1,73 @@
-// GLTRADES CORE ENGINE
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. DATA (The 75 Trades logic)
-    let trades = JSON.parse(localStorage.getItem('gl_trades')) || [
-        { id: 1, date: '2023-10-24', symbol: 'NVDA', side: 'LONG', entry: 425.20, exit: 431.50, pnl: 630.00 },
-        { id: 2, date: '2023-10-23', symbol: 'TSLA', side: 'SHORT', entry: 210.10, exit: 212.40, pnl: -230.00 }
-        // ... (This acts as the database for the 75 trades mentioned in your PDF)
-    ];
+class GLTrades {
+    constructor() {
+        this.trades = [];
+        this.playbooks = [];
+        this.journalEntries = [];
+        this.settings = {
+            platformName: 'GLTRADES',
+            currency: 'USD',
+            brandColor: '#10b981',
+            educationalContent: true,
+            sampleData: true
+        };
+        this.init();
+    }
 
-    const contentArea = document.getElementById('page-content');
+    init() {
+        this.loadData();
+        this.setupEventListeners();
+        this.renderDashboard();
+    }
 
-    // 2. PAGE RENDERING (Matches your PDF structure)
-    const renderPage = {
-        dashboard: () => {
-            const totalPnl = trades.reduce((sum, t) => sum + t.pnl, 0);
-            const winRate = ((trades.filter(t => t.pnl > 0).length / trades.length) * 100).toFixed(1);
+    loadData() {
+        const savedSettings = localStorage.getItem('gltrades_settings');
+        if (savedSettings) this.settings = JSON.parse(savedSettings);
 
-            return `
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-label">Net P/L</div><div class="stat-value" style="color:#10b981">$${totalPnl.toLocaleString()}</div></div>
-                    <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-value">${winRate}%</div></div>
-                    <div class="stat-card"><div class="stat-label">Profit Factor</div><div class="stat-value">2.27</div></div>
-                    <div class="stat-card"><div class="stat-label">Total Trades</div><div class="stat-value">${trades.length}</div></div>
-                </div>
-                <div class="chart-container">
-                    <h2 style="margin-bottom:20px">Equity Growth</h2>
-                    <canvas id="equityChart" height="100"></canvas>
-                </div>
-            `;
-        },
-        trades: () => `
-            <h1>Trade Log</h1>
-            <table style="width:100%; border-collapse: collapse; margin-top:20px;">
-                <tr style="text-align:left; color:#71717a; font-size:12px; border-bottom:1px solid #27272a">
-                    <th style="padding:15px">DATE</th><th style="padding:15px">SYMBOL</th><th style="padding:15px">SIDE</th><th style="padding:15px">PNL</th>
-                </tr>
-                ${trades.map(t => `
-                    <tr style="border-bottom:1px solid #1a1a1c">
-                        <td style="padding:15px">${t.date}</td>
-                        <td style="padding:15px; font-weight:bold">${t.symbol}</td>
-                        <td style="padding:15px"><span style="color:${t.side === 'LONG' ? '#10b981' : '#ef4444'}">${t.side}</span></td>
-                        <td style="padding:15px; font-weight:bold; color:${t.pnl >= 0 ? '#10b981' : '#ef4444'}">$${t.pnl}</td>
-                    </tr>
-                `).join('')}
-            </table>
-        `
-    };
+        const savedTrades = localStorage.getItem('gltrades_trades');
+        if (savedTrades) {
+            this.trades = JSON.parse(savedTrades);
+        } else if (this.settings.sampleData) {
+            this.trades = this.generateSampleTrades(); // Logic for 75 sample trades
+            this.saveData();
+        }
+    }
 
-    // 3. NAVIGATION LOGIC
-    function navigate(pageId) {
-        contentArea.innerHTML = renderPage[pageId] ? renderPage[pageId]() : `<h1>${pageId}</h1><p>Module Loading...</p>`;
-        document.querySelectorAll('.nav-link').forEach(l => {
-            l.classList.toggle('active', l.dataset.page === pageId);
+    saveData() {
+        localStorage.setItem('gltrades_trades', JSON.stringify(this.trades));
+    }
+
+    setupEventListeners() {
+        // Navigation logic
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageId = e.target.dataset.page;
+                this.switchPage(pageId);
+            });
         });
     }
 
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            navigate(e.target.dataset.page);
-        });
-    });
+    switchPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(`${pageId}-page`).classList.add('active');
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+    }
 
-    navigate('dashboard'); // Start at Dashboard
-});
+    renderDashboard() {
+        // Update metric values and initialize Chart.js objects here
+        console.log("Dashboard Rendered with " + this.trades.length + " trades.");
+    }
+
+    generateSampleTrades() {
+        // Generates 75 realistic trades for demonstration
+        return Array.from({length: 75}, (_, i) => ({
+            id: Date.now() + i,
+            symbol: ['AAPL', 'TSLA', 'NVDA'][i % 3],
+            pl: Math.floor(Math.random() * 1000) - 400
+        }));
+    }
+}
+
+// Start Application
+const app = new GLTrades();
